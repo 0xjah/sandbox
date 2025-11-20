@@ -1,0 +1,36 @@
+version: "3.8"
+
+services:
+  browser:
+    build: ./browser
+    networks: [sandbox-net]
+    read_only: true
+    tmpfs: ["/tmp"]
+    volumes:
+      - browser-profile:/home/nonroot/.config/chromium
+      - logs:/var/log/sandbox
+    cap_drop: [ALL]
+    security_opt:
+      - no-new-privileges:true
+
+  proxy:
+    build: ./proxy
+    networks: [sandbox-net]
+    cap_add: [NET_ADMIN]
+    volumes:
+      - logs:/var/log/sandbox
+
+  logger:
+    build: ./logger
+    networks: [sandbox-net]
+    cap_add: [NET_ADMIN, NET_RAW]
+    volumes:
+      - logs:/var/log/sandbox
+
+networks:
+  sandbox-net:
+    external: true
+
+volumes:
+  browser-profile:
+  logs:
