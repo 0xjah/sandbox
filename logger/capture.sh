@@ -30,8 +30,17 @@ kill_children() {
 
 trap 'kill_children; exit 0' TERM INT
 
-# Start tcpdump to write raw pcap
-TCMD="tcpdump -i $INTERFACE -w $PCAP_FILE -U"
+# Rotation options (size in MB and number of files)
+ROTATE_SIZE_MB=${ROTATE_SIZE_MB:-0}
+ROTATE_FILES=${ROTATE_FILES:-0}
+
+# Start tcpdump to write raw pcap. If rotation is requested, use -C and -W.
+if [ "$ROTATE_SIZE_MB" -gt 0 ] && [ "$ROTATE_FILES" -gt 0 ]; then
+	# When rotating, tcpdump will append numeric suffixes to the filename.
+	TCMD="tcpdump -i $INTERFACE -w $PCAP_FILE -U -C $ROTATE_SIZE_MB -W $ROTATE_FILES"
+else
+	TCMD="tcpdump -i $INTERFACE -w $PCAP_FILE -U"
+fi
 if [ -n "$PCAP_FILTER" ]; then
 	TCMD="$TCMD $PCAP_FILTER"
 fi
