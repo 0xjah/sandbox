@@ -23,7 +23,8 @@ services:
     networks: [sandbox-net]
     cap_add: [NET_ADMIN, NET_RAW]
     volumes:
-      - logs:/var/log/sandbox
+      # Bind-mount host ./tmp for easy access to captures on the host filesystem.
+      - ./tmp:/var/log/sandbox
 
 networks:
   sandbox-net:
